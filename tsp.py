@@ -31,7 +31,7 @@ def generateEuclideanDistance(countryCoordinates):
     initializePopulation(countryCoordinates,euclideanDistance)
 
 def initializePopulation(countryCoordinates,euclideanDistance):
-    Population=[]gu
+    Population=[]
     listOfCountries=[]
  
     for country in countryCoordinates:
