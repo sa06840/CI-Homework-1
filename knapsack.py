@@ -7,6 +7,7 @@ class Knapsack():
         self.populationSize = 30
         self.population = [0]*self.populationSize
         self.text = []
+        self.mutationRate = 0.5
 
         file = open('/Users/sajeelnadeemalam/Documents/CI/assignment_1/instances_01_KP/low-dimensional/f8_l-d_kp_23_10000', 'r')
         read = file.readlines()
@@ -24,7 +25,6 @@ class Knapsack():
             for j in range(self.text[0][0]):
                 chromosome[j] = random.randint(0,1)
             self.population[i] = [0, chromosome]
-        return self.population
 
     def calculateFitness(self):
         for i in range(len(self.population)):
@@ -37,8 +37,7 @@ class Knapsack():
                 self.population[i][0] = totalProfit
                 if totalWeight > self.text[0][1]:
                     self.population[i][0] = 0
-        return self.population
-
+    
     def selectionRandom(self):
         p1Index = random.randint(0,self.populationSize-1)
         p2Index = random.randint(0,self.populationSize-1)
@@ -62,36 +61,45 @@ class Knapsack():
         offspring2[start:end+1] = p2[start:end+1]
         offspring2[0:start] = p1[0:start]
         offspring2[end+1:len(p1)] = p1[end+1:len(p1)]
+
+        offspring1 = [0, offspring1]
+        offspring2 = [0, offspring2]
+
+        return [offspring1, offspring2]
         
     def mutation(self, offspring):
         randomIndex1 = random.randint(0,self.text[0][0]-1)
         randomIndex2 = random.randint(0,self.text[0][0]-1)
         while randomIndex1 == randomIndex2:
             randomIndex2 = random.randint(0,self.text[0][0]-1)
-        if offspring[randomIndex1] == 1:
-            offspring[randomIndex1] = 0
-            if offspring[randomIndex2] == 1:
-                offspring[randomIndex2] = 0
+        if offspring[1][randomIndex1] == 1:
+            offspring[1][randomIndex1] = 0
+            if offspring[1][randomIndex2] == 1:
+                offspring[1][randomIndex2] = 0
             else:
-                offspring[randomIndex2] = 1
+                offspring[1][randomIndex2] = 1
         else:
-            offspring[randomIndex1] = 1
-            if offspring[randomIndex2] == 1:
-                offspring[randomIndex2] = 0
+            offspring[1][randomIndex1] = 1
+            if offspring[1][randomIndex2] == 1:
+                offspring[1][randomIndex2] = 0
             else:
-                offspring[randomIndex2] = 1
-
+                offspring[1][randomIndex2] = 1
+        return offspring
+        
     def newFitness(self, offspring):
         totalWeight = 0
         totalProfit = 0
-        for i in range(len(offspring)):
-            if offspring[i] != 0:
+        for i in range(len(offspring[1])):
+            if offspring[1][i] != 0:
                 totalWeight += self.text[i+1][1]
                 totalProfit += self.text[i+1][0]
-            offspring.insert(0, totalProfit)
+                # print(offspring)
+                # print(i)
+            offspring[0] = totalProfit
+            # offspring.insert(0, totalProfit)
             if totalWeight > 10000:
                 offspring[0] = 0
-        self.population.append(offspring)
+        return offspring
 
     def fitnessSurvivor(self):
         self.population.sort()
@@ -99,8 +107,41 @@ class Knapsack():
         self.population = self.population[0:self.populationSize]
 
 
+def evolutionaryAlgorithm():
 
+    for iteration in range(10):
 
+        print("***** Iteration Number = " + str(iteration+1) + " *****")
+        k1 = Knapsack()
+        k1.populate()
+        k1.calculateFitness()
+
+        for generation in range(1000):
+            print("***** Generation Number = " + str(generation+1) + " *****")
+            generationOffsprings = []
+
+            for i in range(5):
+                parents = k1.selectionRandom()
+                p1 = parents[0]
+                p2 = parents[1]
+                offsprings = k1.crossover(p1, p2)
+                for j in range(2):
+                    randomNumber = random.randint(0,1)
+                    if randomNumber == 1:
+                        tempOffspring = k1.mutation(offsprings[j])
+                        offsprings[j] = tempOffspring
+
+                    offspring = k1.newFitness(offsprings[j])
+                    k1.population.append(offspring)
+
+            k1.population.sort()
+            k1.population.reverse()
+
+            k1.population = k1.population[0:30]
+
+            print(k1.population[0])
+  
+evolutionaryAlgorithm()
 
 
 
