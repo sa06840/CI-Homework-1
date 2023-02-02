@@ -17,10 +17,10 @@ class Knapsack():
                 self.text.append(row)
             else:
                 row = [int(i) for i in line.split()]
-                self.text.append(row)
+                self.text.append(row)  
 
     def populate(self):
-        for i in range(30):
+        for i in range(self.populationSize):
             chromosome = [0] * self.text[0][0]
             for j in range(self.text[0][0]):
                 chromosome[j] = random.randint(0,1)
@@ -36,7 +36,7 @@ class Knapsack():
                     totalProfit += self.text[j+1][0]
                 self.population[i][0] = totalProfit
                 if totalWeight > self.text[0][1]:
-                    self.population[i][0] = 0
+                    self.population[i][0] = 100
     
     def selectionRandom(self):
         p1Index = random.randint(0,self.populationSize-1)
@@ -51,16 +51,29 @@ class Knapsack():
         offspring1 = offspring2 = [0]*self.text[0][0]
         p1 = p1[1]
         p2 = p2[1]
-        start = random.randint(0, len(p1)//2)
-        end = random.randint(len(p2)//2 + 1, len(p2)-1)
 
-        offspring1[start:end+1] = p1[start:end+1]
-        offspring1[0:start] = p2[0:start]
-        offspring1[end+1:len(p1)] = p2[end+1:len(p1)]
+        start = random.randint(0, self.text[0][0])
+        end = random.randint(0, self.text[0][0])
+        while start == end:
+            end = random.randint(0, self.text[0][0])
+        
+        if start > end:
 
-        offspring2[start:end+1] = p2[start:end+1]
-        offspring2[0:start] = p1[0:start]
-        offspring2[end+1:len(p1)] = p1[end+1:len(p1)]
+            offspring1[start:len(p1)] = p1[start:len(p1)]
+            offspring1[0:end] = p1[0:end]
+            offspring1[end:start] = p2[end:start]
+            offspring2[start:len(p1)] = p2[start:len(p1)]
+            offspring2[0:end] = p2[0:end]
+            offspring2[end:start] = p1[end:start]
+
+        elif start < end:
+
+            offspring1[start:end] = p1[start:end]
+            offspring1[end:len(p1)] = p2[end:len(p1)]
+            offspring1[0:start] = p2[0:start]
+            offspring2[start:end] = p2[start:end]
+            offspring2[end:len(p1)] = p1[end:len(p1)]
+            offspring2[0:start] = p1[0:start]
 
         offspring1 = [0, offspring1]
         offspring2 = [0, offspring2]
@@ -72,12 +85,14 @@ class Knapsack():
         randomIndex2 = random.randint(0,self.text[0][0]-1)
         while randomIndex1 == randomIndex2:
             randomIndex2 = random.randint(0,self.text[0][0]-1)
+
         if offspring[1][randomIndex1] == 1:
             offspring[1][randomIndex1] = 0
             if offspring[1][randomIndex2] == 1:
                 offspring[1][randomIndex2] = 0
             else:
                 offspring[1][randomIndex2] = 1
+
         else:
             offspring[1][randomIndex1] = 1
             if offspring[1][randomIndex2] == 1:
@@ -90,21 +105,48 @@ class Knapsack():
         totalWeight = 0
         totalProfit = 0
         for i in range(len(offspring[1])):
+            
             if offspring[1][i] != 0:
                 totalWeight += self.text[i+1][1]
                 totalProfit += self.text[i+1][0]
-                # print(offspring)
-                # print(i)
+
             offspring[0] = totalProfit
-            # offspring.insert(0, totalProfit)
-            if totalWeight > 10000:
-                offspring[0] = 0
+            if totalWeight > self.text[0][1]:
+                offspring[0] = 100
         return offspring
 
-    def fitnessSurvivor(self):
+    def truncation(self):
         self.population.sort()
         self.population.reverse()
-        self.population = self.population[0:self.populationSize]
+        self.population = self.population[0:30]
+
+    def fitnessProportional(self):
+        sumFitness = 0
+        normalizedFitness = []
+        ranges = []
+        newPopulation = []
+        for chromosome in self.population:
+            sumFitness += chromosome[0]
+        for chromosome in self.population:
+            normalizedFitness.append(chromosome[0]/sumFitness)
+        pointer = 0
+        for i in range(len(normalizedFitness)):
+            limits = [pointer, pointer+normalizedFitness[i]]
+            ranges.append(limits)
+            pointer += normalizedFitness[i]
+    
+        while len(newPopulation) < self.populationSize:
+            randomNumber = random.uniform(0,1)
+            for index in range(len(ranges)):
+                if randomNumber >= ranges[index][0] and randomNumber <= ranges[index][1]:
+                    if self.population[index] not in newPopulation:
+                        newPopulation.append(self.population[index])
+                    else:
+                        break
+        
+        self.population = newPopulation
+        self.population.sort()
+        self.population.reverse()
 
 
 def evolutionaryAlgorithm():
@@ -117,8 +159,7 @@ def evolutionaryAlgorithm():
         k1.calculateFitness()
 
         for generation in range(1000):
-            print("***** Generation Number = " + str(generation+1) + " *****")
-            generationOffsprings = []
+            print("***** Iteration Number = " + str(iteration+1) + ", Generation Number = " + str(generation+1) + " *****")
 
             for i in range(5):
                 parents = k1.selectionRandom()
@@ -134,10 +175,8 @@ def evolutionaryAlgorithm():
                     offspring = k1.newFitness(offsprings[j])
                     k1.population.append(offspring)
 
-            k1.population.sort()
-            k1.population.reverse()
-
-            k1.population = k1.population[0:30]
+            # k1.truncation()
+            k1.fitnessProportional()
 
             print(k1.population[0])
   
