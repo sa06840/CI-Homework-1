@@ -1,4 +1,5 @@
 import random
+import numpy as np
 
 class Knapsack():
     
@@ -17,14 +18,33 @@ class Knapsack():
                 self.text.append(row)
             else:
                 row = [int(i) for i in line.split()]
-                self.text.append(row)  
+                self.text.append(row)
+
+    def goodPopulate(self):
+        for i in range(self.populationSize):
+            chromosome = [0] * self.text[0][0]
+            totalWeight = 0
+            totalProfit = 0
+            while totalWeight <= 10000:
+                randomNumber = random.randint(0,self.text[0][0]-1)
+                while chromosome[randomNumber] == 1:
+                    randomNumber = random.randint(0,self.text[0][0]-1)
+                if (totalWeight + self.text[randomNumber+1][1]) <= 10000:
+                    chromosome[randomNumber] = 1
+                    totalWeight += self.text[randomNumber+1][1]
+                    totalProfit += self.text[randomNumber+1][0]
+                else:
+                    break
+            self.population[i] = [totalProfit, chromosome]
+        # print(len(self.population))
+        # print(self.population)
 
     def populate(self):
         for i in range(self.populationSize):
             chromosome = [0] * self.text[0][0]
             for j in range(self.text[0][0]):
                 chromosome[j] = random.randint(0,1)
-            self.population[i] = [0, chromosome]
+            self.population[i] = [100, chromosome]
 
     def calculateFitness(self):
         for i in range(len(self.population)):
@@ -48,14 +68,16 @@ class Knapsack():
         return [p1, p2]
 
     def crossover(self, p1, p2):
-        offspring1 = offspring2 = [0]*self.text[0][0]
+        offspring1 = [0]*self.text[0][0]
+        offspring2 = [0]*self.text[0][0]
+
         p1 = p1[1]
         p2 = p2[1]
 
-        start = random.randint(0, self.text[0][0])
-        end = random.randint(0, self.text[0][0])
+        start = random.randint(0, self.text[0][0]-1)
+        end = random.randint(0, self.text[0][0]-1)
         while start == end:
-            end = random.randint(0, self.text[0][0])
+            end = random.randint(0, self.text[0][0]-1)
         
         if start > end:
 
@@ -81,24 +103,37 @@ class Knapsack():
         return [offspring1, offspring2]
         
     def mutation(self, offspring):
-        randomIndex1 = random.randint(0,self.text[0][0]-1)
-        randomIndex2 = random.randint(0,self.text[0][0]-1)
-        while randomIndex1 == randomIndex2:
-            randomIndex2 = random.randint(0,self.text[0][0]-1)
+        repeated = []
+        for i in range(2):
+            randomIndex = random.randint(0, self.text[0][0]-1)
 
-        if offspring[1][randomIndex1] == 1:
-            offspring[1][randomIndex1] = 0
-            if offspring[1][randomIndex2] == 1:
-                offspring[1][randomIndex2] = 0
-            else:
-                offspring[1][randomIndex2] = 1
+            while randomIndex in repeated:
+                randomIndex = random.randint(0, self.text[0][0]-1)
 
-        else:
-            offspring[1][randomIndex1] = 1
-            if offspring[1][randomIndex2] == 1:
-                offspring[1][randomIndex2] = 0
-            else:
-                offspring[1][randomIndex2] = 1
+            if offspring[1][randomIndex] == 1:
+                offspring[1][randomIndex] = 0
+            elif offspring[1][randomIndex] == 0:
+                offspring[1][randomIndex] = 1
+            repeated.append(randomIndex)
+
+        # randomIndex1 = random.randint(0,self.text[0][0]-1)
+        # randomIndex2 = random.randint(0,self.text[0][0]-1)
+        # while randomIndex1 == randomIndex2:
+        #     randomIndex2 = random.randint(0,self.text[0][0]-1)
+
+        # if offspring[1][randomIndex1] == 1:
+        #     offspring[1][randomIndex1] = 0
+        #     if offspring[1][randomIndex2] == 1:
+        #         offspring[1][randomIndex2] = 0
+        #     else:
+        #         offspring[1][randomIndex2] = 1
+
+        # else:
+        #     offspring[1][randomIndex1] = 1
+        #     if offspring[1][randomIndex2] == 1:
+        #         offspring[1][randomIndex2] = 0
+        #     else:
+        #         offspring[1][randomIndex2] = 1
         return offspring
         
     def newFitness(self, offspring):
@@ -120,11 +155,25 @@ class Knapsack():
         self.population.reverse()
         self.population = self.population[0:30]
 
+    def fitnessHelper(self, chromosomes, fitness, probabilities):
+
+        randomNumber = round(random.uniform(0,1),10)
+
+        choose = 0
+        count = 0
+        for value in probabilities:
+            choose = choose + value
+            count += 1
+            if choose >= randomNumber:
+                # print(chromosomes[probabilities.index(value)])
+                return probabilities.index(value)
+                # return [fitness[probabilities.index(value)], chromosomes[probabilities.index(value)]]
+
     def fitnessProportional(self):
+
         sumFitness = 0
         normalizedFitness = []
         ranges = []
-        newPopulation = []
         for chromosome in self.population:
             sumFitness += chromosome[0]
         for chromosome in self.population:
@@ -134,19 +183,21 @@ class Knapsack():
             limits = [pointer, pointer+normalizedFitness[i]]
             ranges.append(limits)
             pointer += normalizedFitness[i]
-    
-        while len(newPopulation) < self.populationSize:
-            randomNumber = random.uniform(0,1)
+
+        randomIndex = random.uniform(0,1)
+        for index in range(len(ranges)):
+            if randomIndex >= ranges[index][0] and randomIndex < ranges[index][1]:
+                p1Index = index
+            
+        p2Index = p1Index
+        while(p1Index == p2Index):
+            randomIndex = random.uniform(0,1)
             for index in range(len(ranges)):
-                if randomNumber >= ranges[index][0] and randomNumber <= ranges[index][1]:
-                    if self.population[index] not in newPopulation:
-                        newPopulation.append(self.population[index])
-                    else:
-                        break
-        
-        self.population = newPopulation
-        self.population.sort()
-        self.population.reverse()
+                if randomIndex >= ranges[index][0] and randomIndex < ranges[index][1]:
+                    p2Index = index
+
+        return [self.population[p1Index], self.population[p2Index]]
+            
 
 
 def evolutionaryAlgorithm():
@@ -155,14 +206,16 @@ def evolutionaryAlgorithm():
 
         print("***** Iteration Number = " + str(iteration+1) + " *****")
         k1 = Knapsack()
-        k1.populate()
-        k1.calculateFitness()
+        # k1.populate()
+        k1.goodPopulate()
+        # k1.calculateFitness()
 
         for generation in range(1000):
             print("***** Iteration Number = " + str(iteration+1) + ", Generation Number = " + str(generation+1) + " *****")
 
             for i in range(5):
-                parents = k1.selectionRandom()
+                # parents = k1.selectionRandom()
+                parents = k1.fitnessProportional()
                 p1 = parents[0]
                 p2 = parents[1]
                 offsprings = k1.crossover(p1, p2)
@@ -175,8 +228,8 @@ def evolutionaryAlgorithm():
                     offspring = k1.newFitness(offsprings[j])
                     k1.population.append(offspring)
 
-            # k1.truncation()
-            k1.fitnessProportional()
+            k1.truncation()
+            # k1.fitnessProportional()
 
             print(k1.population[0])
   
