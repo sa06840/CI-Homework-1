@@ -3,14 +3,13 @@ import numpy as np
 
 class Knapsack():
     
-    def __init__(self) -> None:
+    def __init__(self, file) -> None:
 
         self.populationSize = 30
         self.population = [0]*self.populationSize
         self.text = []
         self.mutationRate = 0.5
 
-        file = open('/Users/sajeelnadeemalam/Documents/CI/assignment_1/instances_01_KP/low-dimensional/f8_l-d_kp_23_10000', 'r')
         read = file.readlines()
         for line in read:
             if line[-1] == '\n':
@@ -155,20 +154,6 @@ class Knapsack():
         self.population.reverse()
         self.population = self.population[0:30]
 
-    def fitnessHelper(self, chromosomes, fitness, probabilities):
-
-        randomNumber = round(random.uniform(0,1),10)
-
-        choose = 0
-        count = 0
-        for value in probabilities:
-            choose = choose + value
-            count += 1
-            if choose >= randomNumber:
-                # print(chromosomes[probabilities.index(value)])
-                return probabilities.index(value)
-                # return [fitness[probabilities.index(value)], chromosomes[probabilities.index(value)]]
-
     def fitnessProportional(self):
 
         sumFitness = 0
@@ -197,25 +182,69 @@ class Knapsack():
                     p2Index = index
 
         return [self.population[p1Index], self.population[p2Index]]
+    
+    def rankBased(self):
+
+        self.population.sort()
+        ranks = []
+        normalizedRanks = []
+        sumRanks = 0
+        ranges = []
+
+        for rank in range(1, len(self.population)+1):
+            ranks.append(rank)
+            sumRanks += rank
+        self.population.reverse()
+        ranks.reverse()
+        for i in ranks:
+            normalizedRanks.append(i/sumRanks)
+
+        pointer = 0
+        for i in range(len(normalizedRanks)):
+            limits = [pointer, pointer+normalizedRanks[i]]
+            ranges.append(limits)
+            pointer += normalizedRanks[i]
+        
+        randomIndex = random.uniform(0,1)
+        for index in range(len(ranges)):
+            if randomIndex >= ranges[index][0] and randomIndex < ranges[index][1]:
+                p1Index = index
+            
+        p2Index = p1Index
+        while(p1Index == p2Index):
+            randomIndex = random.uniform(0,1)
+            for index in range(len(ranges)):
+                if randomIndex >= ranges[index][0] and randomIndex < ranges[index][1]:
+                    p2Index = index
+
+        return [self.population[p1Index], self.population[p2Index]]
+
+    def survivorRandom(self):
+        randomlist = random.sample(range(0, 40), 30)
+        temp_population = []
+        for index in randomlist:
+            temp_population.append(self.population[index])
+        self.population=temp_population
             
 
 
 def evolutionaryAlgorithm():
 
-    for iteration in range(10):
+    # for iteration in range(10):
 
-        print("***** Iteration Number = " + str(iteration+1) + " *****")
-        k1 = Knapsack()
+    #     print("***** Iteration Number = " + str(iteration+1) + " *****")
+        k1 = Knapsack(file = open('/Users/sajeelnadeemalam/Documents/CI/assignment_1/instances_01_KP/low-dimensional/f8_l-d_kp_23_10000', 'r'))
         # k1.populate()
         k1.goodPopulate()
         # k1.calculateFitness()
 
-        for generation in range(1000):
-            print("***** Iteration Number = " + str(iteration+1) + ", Generation Number = " + str(generation+1) + " *****")
+        for generation in range(100):
+            # print("***** Iteration Number = " + str(iteration+1) + ", Generation Number = " + str(generation+1) + " *****")
 
             for i in range(5):
                 # parents = k1.selectionRandom()
-                parents = k1.fitnessProportional()
+                # # parents = k1.fitnessProportional()
+                parents = k1.rankBased()
                 p1 = parents[0]
                 p2 = parents[1]
                 offsprings = k1.crossover(p1, p2)
@@ -229,7 +258,7 @@ def evolutionaryAlgorithm():
                     k1.population.append(offspring)
 
             k1.truncation()
-            # k1.fitnessProportional()
+            # k1.selectionRandom()
 
             print(k1.population[0])
   
