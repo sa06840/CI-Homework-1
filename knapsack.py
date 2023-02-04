@@ -149,11 +149,6 @@ class Knapsack():
                 offspring[0] = 100
         return offspring
 
-    def truncation(self):
-        self.population.sort()
-        self.population.reverse()
-        self.population = self.population[0:30]
-
     def fitnessProportional(self):
 
         sumFitness = 0
@@ -218,6 +213,30 @@ class Knapsack():
                     p2Index = index
 
         return [self.population[p1Index], self.population[p2Index]]
+    
+    def parentTruncation(self):
+        self.population.sort()
+        self.population.reverse()
+        return [self.population[0], self.population[1]]
+    
+    def parentBinary(self):
+        contestant1 = random.randint(0, self.populationSize-1)
+        contestant2 = random.choice(list(set(range(0, self.populationSize)) - set([contestant1])))
+
+        if self.population[contestant1][0] >= self.population[contestant2][0]:
+            p1Index = contestant1
+        else:
+            p1Index = contestant2
+
+        contestant1 = random.choice(list(set(range(0, self.populationSize)) - set([p1Index])))
+        contestant2 = random.choice(list(set(range(0, self.populationSize)) - set([p1Index, contestant1])))
+
+        if self.population[contestant1][0] >= self.population[contestant2][0]:
+            p2Index = contestant1
+        else:
+            p2Index = contestant2
+
+        return [self.population[p1Index], self.population[p2Index]]
 
     def survivorRandom(self):
         randomlist = random.sample(range(0, 40), 30)
@@ -226,6 +245,28 @@ class Knapsack():
             temp_population.append(self.population[index])
         self.population=temp_population
             
+    def truncation(self):
+        self.population.sort()
+        self.population.reverse()
+        self.population = self.population[0:30]
+
+    def survivorBinary(self):
+        selectedIndexes = []
+
+        for i in range(self.populationSize):
+            contestant1 = random.choice(list(set(range(0, len(self.population))) - set(selectedIndexes)))
+            contestant2 = random.choice(list(set(range(0, len(self.population))) - set(selectedIndexes + [contestant1])))
+
+            if self.population[contestant1][0] >= self.population[contestant2][0]:
+                selectedIndexes.append(contestant1)
+            else:
+                selectedIndexes.append(contestant2)
+
+        tempPopulation = []
+        for index in selectedIndexes:
+            tempPopulation.append(self.population[index])
+        
+        self.population = tempPopulation
 
 
 def evolutionaryAlgorithm():
@@ -245,6 +286,9 @@ def evolutionaryAlgorithm():
                 # parents = k1.selectionRandom()
                 # # parents = k1.fitnessProportional()
                 parents = k1.rankBased()
+                # parents = k1.parentTruncation()
+                parents = k1.parentBinary()
+
                 p1 = parents[0]
                 p2 = parents[1]
                 offsprings = k1.crossover(p1, p2)
@@ -257,8 +301,10 @@ def evolutionaryAlgorithm():
                     offspring = k1.newFitness(offsprings[j])
                     k1.population.append(offspring)
 
-            k1.truncation()
+            # k1.truncation()
             # k1.selectionRandom()
+            k1.survivorBinary()
+
 
             print(k1.population[0])
   
