@@ -18,9 +18,9 @@ class TSP():
         self.fitness=[]                     #stores total distance of every solution
         self.bestFitness= []
         self.averageFitness =[]
-        self.numOfGenerations = 100
+        self.numOfGenerations = 1000
         self.numOfIterations  = 10
-        self.maxDistance = 0  #changed
+        self.maxDistance = 0 #changed
         
         
         self.bestsofar = 9999999999
@@ -273,58 +273,58 @@ class TSP():
         
         self.population = tempPopulation 
 
-    # def generationEvaluation(self):
-    #     totalDistance = 0
+    def generationEvaluation(self):
+        totalDistance = 0
         
-    #     for chromosome in self.population:
-    #         totalDistance += chromosome[0]
-    #         if chromosome[0] < self.bestsofar:
-    #             self.bestsofar = chromosome[0]
+        for chromosome in self.population:
+            totalDistance += self.maxDistance-chromosome[0]
+            if (self.maxDistance-chromosome[0]) < self.bestsofar:
+                self.bestsofar = self.maxDistance-chromosome[0]
 
-    #     self.averageFitness.append(totalDistance/len(self.population))
-    #     self.bestFitness.append(self.bestsofar)
+        self.averageFitness.append(totalDistance/len(self.population))
+        self.bestFitness.append(self.bestsofar)
 
-    # def iterationEvaluation(self, fitnessEvaluation,iteration):
-    #     # print(iteration)
-    #     if iteration not in fitnessEvaluation:
-    #         fitnessEvaluation[iteration] = [[],[]]
-    #         fitnessEvaluation[iteration][0] = self.averageFitness 
-    #         fitnessEvaluation[iteration][1] = self.bestFitness
+    def iterationEvaluation(self, fitnessEvaluation,iteration):
+        # print(iteration)
+        if iteration not in fitnessEvaluation:
+            fitnessEvaluation[iteration] = [[],[]]
+            fitnessEvaluation[iteration][0] = self.averageFitness 
+            fitnessEvaluation[iteration][1] = self.bestFitness
           
-    # def plotGraphs(self, fitnessEvaluation):
-    #     x_axis_generations = []
-    #     addedAverageFitness = [0]*self.numOfGenerations
-    #     addedBestFitness = [0]*self.numOfGenerations
-    #     avgAverageFitness = []
-    #     avgBestFitness = []
+    def plotGraphs(self, fitnessEvaluation):
+        x_axis_generations = []
+        addedAverageFitness = [0]*self.numOfGenerations
+        addedBestFitness = [0]*self.numOfGenerations
+        avgAverageFitness = []
+        avgBestFitness = []
 
-    #     # list representing x axis (num of Generations)
-    #     for i in range (1, self.numOfGenerations+1):
-    #         x_axis_generations.append(i)
+        # list representing x axis (num of Generations)
+        for i in range (1, self.numOfGenerations+1):
+            x_axis_generations.append(i)
        
-    #    #adding avgaveragefitness and best fitness values across all iterations
-    #     for iteration in (fitnessEvaluation):
-    #         addedAverageFitness = list(map(add, fitnessEvaluation[iteration][0], addedAverageFitness))
-    #         addedBestFitness  = list(map(add, fitnessEvaluation[iteration][1], addedBestFitness ))
+       #adding avgaveragefitness and best fitness values across all iterations
+        for iteration in (fitnessEvaluation):
+            addedAverageFitness = list(map(add, fitnessEvaluation[iteration][0], addedAverageFitness))
+            addedBestFitness  = list(map(add, fitnessEvaluation[iteration][1], addedBestFitness ))
         
-    #     #adjusting added avgavergaefitness and best fitness values
-    #     #creating list representing y_axis (average avergae fitness values) and (average average best fitness values)
-    #     for fitness in (addedAverageFitness):
-    #         avgAverageFitness.append(fitness/self.numOfIterations)
+        #adjusting added avgavergaefitness and best fitness values
+        #creating list representing y_axis (average avergae fitness values) and (average average best fitness values)
+        for fitness in (addedAverageFitness):
+            avgAverageFitness.append(fitness/self.numOfIterations)
         
-    #     for fitness in (addedBestFitness):
-    #         avgBestFitness.append(fitness/self.numOfIterations)
+        for fitness in (addedBestFitness):
+            avgBestFitness.append(fitness/self.numOfIterations)
               
-    #     plt.plot(x_axis_generations, avgAverageFitness, label = "Average Fitness")
-    #     plt.plot(x_axis_generations, avgBestFitness, label = "Best Fitness")
+        plt.plot(x_axis_generations, avgAverageFitness, label = "Average Fitness")
+        plt.plot(x_axis_generations, avgBestFitness, label = "Best Fitness")
         
-    #     plt.legend()
-    #     plt.show()
+        plt.legend()
+        plt.show()
 
 # Evolutionary Algorithm
 def evolutionaryAlgorithm():
-    # fitnessEvaluation = dict()
-    # for iteration in range(1, 11):
+    fitnessEvaluation = dict()
+    for iteration in range(1, 11):
 
         # print("***** Iteration Number = " + str(iteration+1) + " *****")
         filename ='qa194.tsp'
@@ -332,7 +332,7 @@ def evolutionaryAlgorithm():
         # T1.populate()
         T1.calculateFitness()
 
-        for generation in range(100):
+        for generation in range(T1.numOfGenerations):
             # print("***** Iteration Number = " + str(iteration+1) + ", Generation Number = " + str(generation+1) + " *****")
 
             for i in range(5):
@@ -372,19 +372,20 @@ def evolutionaryAlgorithm():
                     # print(len(T1.population))
 
             T1.survivorTruncation()
-            # T1.generationEvaluation()
+            T1.generationEvaluation()
             # T1.survivorBinary()
             # T1.survivorRandom()
             # T1.fitnessProportional()
-            print(T1.population[0])
-            print("distance: " + str(T1.maxDistance-T1.population[0][0]))
+            # print(T1.population[0])
+            # print("distance: " + str(T1.maxDistance-T1.population[0][0]))
         # print(T1.avergeFitness)
         # print(T1.bestFitness)
-        # T1.iterationEvaluation(fitnessEvaluation,iteration)
+        T1.iterationEvaluation(fitnessEvaluation,iteration)
         # print(len(T1.bestFitness))
         # print(len(T1.avergeFitness))
     # print(fitnessEvaluation)
-    # T1.plotGraphs(fitnessEvaluation)
+    T1.plotGraphs(fitnessEvaluation)
 
 evolutionaryAlgorithm()
 
+ 
