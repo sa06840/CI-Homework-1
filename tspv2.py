@@ -1,9 +1,12 @@
 import tsplib95
 import math
 import random
+import random as rm
+
 import copy
 from matplotlib import pyplot as plt
 from operator import add
+
 
 
 
@@ -18,7 +21,7 @@ class TSP():
         self.fitness=[]                     #stores total distance of every solution
         self.bestFitness= []
         self.averageFitness =[]
-        self.numOfGenerations = 1000
+        self.numOfGenerations = 10000
         self.numOfIterations  = 10
         self.maxDistance = 0 #changed
         
@@ -93,48 +96,190 @@ class TSP():
         # self.population.append(offspring)
         return (offspring)
 
-    def crossover(self, p1, p2):
+    # def crossover(self, p1, p2):
         self.length_of_solution=len(self.listOfCountries)
         offspring1 = [0]*self.length_of_solution
         offspring2 = [0]*self.length_of_solution
         #eliminating fitness values for both parents        
         p1 = p1[1]          
-        p2 = p2[1]             
+        p2 = p2[1]   
+        temp=[]     
+        flag =0     
 
         start = random.randint(0, self.length_of_solution-1)
         end = random.randint(0, self.length_of_solution-1)
-        while start == end:
-            end = random.randint(0, self.length_of_solution)
 
-        if start > end:
-            offspring1[start:len(p1)] = p1[start:len(p1)]
-            offspring1[0:end] = p1[0:end]
-            offspring1[end:start] = p2[end:start]
+        while (start==end):
+            end = random.randint(0, self.length_of_solution-1)
+
+        if start>end:
+                temp_index=end
+                end=start
+                start=temp_index   
+        # print("start end indexes")
+        # print(start,end)
+      
+        # if start > end:
+        #     # print("entered")
+        #     offspring1[start:len(p1)] = p1[start:len(p1)]
+        #     offspring1[0:end] = p1[0:end]
+        #     for chromosome in p2[end:len(p2)]:
+        #         if chromosome not in offspring1:
+        #             temp.append(chromosome)
+        #             if len(temp) == (start-end):
+        #                 offspring1[end:start] = temp
+        #                 flag = 1
+        #                 break
+        #     if (flag ==0):
+        #         for chromosome in p2[0:end]:
+        #             if chromosome not in offspring1:
+        #                 temp.append(chromosome)
+        #                 if len(temp) == (start-end):
+        #                     offspring1[end:start] = temp
+        #                     flag = 1
+        #                     break
             
-            offspring2[start:len(p2)] = p2[start:len(p1)]
-            offspring2[0:end] = p2[0:end]
-            offspring2[end:start] = p1[end:start]
+        #     temp=[]
+        #     flag =0
+
+        #     offspring2[start:] = p2[start:]
+        #     offspring2[0:end] = p2[0:end]
+        #     for chromosome in p1[end:]:
+        #         if chromosome not in offspring2:
+        #             temp.append(chromosome)
+        #             if len(temp) == (start-end):
+        #                 offspring2[end:start] = temp
+        #                 flag = 1
+        #                 break
+        #     if (flag ==0):
+        #         for chromosome in p1[0:end]:
+        #             if chromosome not in offspring2:
+        #                 temp.append(chromosome)
+        #                 if len(temp) == (start-end):
+        #                     offspring2[end:start] = temp
+        #                     flag = 1
+        #                     break
             
-        elif start < end:
-            offspring1[start:end] = p1[start:end]
-            offspring1[end:len(p1)] = p2[end:len(p1)]
+            
+        if start < end:
             offspring1[0:start] = p2[0:start]
-       
-            offspring2[start:end] = p2[start:end]
-            offspring2[end:len(p1)] = p1[end:len(p1)]
-            offspring2[0:start] = p1[0:start]
+            offspring1[end:] = p2[end:]
+
+            for chromosome in p1[start:]:
+                if chromosome not in offspring1:
+                    temp.append(chromosome)
+                    if len(temp) == (end-start):
+                        offspring1[start:end] = temp
+                        flag = 1
+                        break
+            if (flag ==0):
+                for chromosome in p1[0:start]:
+                    if chromosome not in offspring1:
+                        temp.append(chromosome)
+                        if len(temp) == (end-start):
+                            offspring1[start:end] = temp
+                            flag = 1
+                            break
+            
+            temp=[]
+            flag =0
+
+            offspring2[:start] = p1[:start]
+            offspring2[end:] = p1[end:]
+
+            for chromosome in p2[start:]:
+                if chromosome not in offspring2:
+                    temp.append(chromosome)
+                    if len(temp) == (end-start):
+                        offspring2[start:end] = temp
+                        flag = 1
+                        break
+            if (flag ==0):
+                for chromosome in p2[0:start]:
+                    if chromosome not in offspring2:
+                        temp.append(chromosome)
+                        if len(temp) == (end-start):
+                            offspring2[start:end] = temp
+                            flag = 1
+                            break
+
 
         offspring1 = [0, offspring1]
         offspring2 = [0, offspring2]
+        print("OFFSPRING 1")
+        print(offspring1)
+        print("OFFSPRING 2")
+        print(offspring2)
+        return [offspring1, offspring2]
+
+    
+    
+    def crossover(self, parent1, parent2):
+        #computing two random points to select elements from parents
+        # self.assign_probabilities()
+        p1 = parent1[1]          
+        p2 = parent2[1]  
+        
+        start_index = random.randint(0, int(len(self.listOfCountries)/2))
+        end_index = random.randint(start_index+1, len(self.listOfCountries)-1)
+
+        offspring1 = [-1 for i in range(len(p1))]
+        offspring1[start_index:end_index+1] = p1[start_index:end_index+1]
+
+        counter = end_index+1
+        for city in p2[end_index+1:]:
+            if city not in offspring1:
+                offspring1[counter] = city
+                counter += 1
+
+        if counter == len(p1):
+            counter=0
+
+        for city in p2[:end_index+1]:
+            if city not in offspring1:
+                offspring1[counter] = city
+                counter+=1
+            if counter == len(p1):
+                counter=0
+            if counter == start_index:
+                break
+        
+
+        offspring2 = [-1 for i in range(len(p1))]
+        offspring2[start_index:end_index+1] = p2[start_index:end_index+1]
+
+        counter = end_index+1
+        for city in p1[end_index+1:]:
+            if city not in offspring2:
+                offspring2[counter] = city
+                counter += 1
+
+        if counter == len(p2):
+            counter=0
+
+        for city in p1[:end_index+1]:
+            #print("p2c2: ",p2_c2[:end_index+1])
+            # print("counter: ", counter)
+            if city not in offspring2:
+                offspring2[counter] = city
+                counter+=1
+            if counter == len(p2):
+                counter=0
+            if counter == start_index:
+                break
+
+        offspring1 = [0, offspring1]
+        offspring2 = [0, offspring2]
+        
 
         return [offspring1, offspring2]
 
     def mutation(self, offspring):
 
-        randomIndex1 = random.randint(0,self.length_of_solution-1)
-        randomIndex2 = random.randint(0,self.length_of_solution-1)
+        randomIndex1 = random.randint(0,len(self.listOfCountries)-1)
+        randomIndex2 = random.randint(0,len(self.listOfCountries)-1)
         while randomIndex1 == randomIndex2:
-            randomIndex2 = random.randint(0,self.length_of_solution-1)
+            randomIndex2 = random.randint(0,len(self.listOfCountries)-1)
         
         country1 = offspring[1][randomIndex1]
         country2 = offspring[1][randomIndex2]
@@ -373,6 +518,7 @@ def evolutionaryAlgorithm():
 
             T1.survivorTruncation()
             T1.generationEvaluation()
+
             # T1.survivorBinary()
             # T1.survivorRandom()
             # T1.fitnessProportional()
@@ -380,10 +526,11 @@ def evolutionaryAlgorithm():
             # print("distance: " + str(T1.maxDistance-T1.population[0][0]))
         # print(T1.avergeFitness)
         # print(T1.bestFitness)
+
         T1.iterationEvaluation(fitnessEvaluation,iteration)
-        # print(len(T1.bestFitness))
-        # print(len(T1.avergeFitness))
+       
     # print(fitnessEvaluation)
+
     T1.plotGraphs(fitnessEvaluation)
 
 evolutionaryAlgorithm()
