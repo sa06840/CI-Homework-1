@@ -1,12 +1,16 @@
 import random
 
-class GraphColoring():
+from selectionSchemes import SelectionSchemes
+
+class GraphColoring(SelectionSchemes):
 
     def __init__(self, file) -> None:
 
         self.text = []
         self.populationSize = 30
         self.population = []
+
+        super()
 
         read = file.readlines()
         for line in read:
@@ -121,173 +125,175 @@ class GraphColoring():
         return offspring
 
 
-    def parentRandom(self):
-        p1Index = random.randint(0,self.populationSize-1)
-        p2Index = random.randint(0,self.populationSize-1)
-        while p1Index == p2Index:
-            p2Index = random.randint(0,self.populationSize-1)
-        p1 = self.population[p1Index]
-        p2 = self.population[p2Index]
-        return [p1, p2]
+    # def parentRandom(self):
+    #     p1Index = random.randint(0,self.populationSize-1)
+    #     p2Index = random.randint(0,self.populationSize-1)
+    #     while p1Index == p2Index:
+    #         p2Index = random.randint(0,self.populationSize-1)
+    #     p1 = self.population[p1Index]
+    #     p2 = self.population[p2Index]
+    #     return [p1, p2]
     
-    def parentFPS(self):
+    # def parentFPS(self):
 
-        sumFitness = 0
-        normalizedFitness = []
-        ranges = []
-        for chromosome in self.population:
-            sumFitness += chromosome[0]
-        for chromosome in self.population:
-            normalizedFitness.append(chromosome[0]/sumFitness)
-        pointer = 0
-        for i in range(len(normalizedFitness)):
-            limits = [pointer, pointer+normalizedFitness[i]]
-            ranges.append(limits)
-            pointer += normalizedFitness[i]
+    #     sumFitness = 0
+    #     normalizedFitness = []
+    #     ranges = []
+    #     for chromosome in self.population:
+    #         sumFitness += chromosome[0]
+    #     for chromosome in self.population:
+    #         normalizedFitness.append(chromosome[0]/sumFitness)
+    #     pointer = 0
+    #     for i in range(len(normalizedFitness)):
+    #         limits = [pointer, pointer+normalizedFitness[i]]
+    #         ranges.append(limits)
+    #         pointer += normalizedFitness[i]
 
-        randomIndex = random.uniform(0,1)
-        for index in range(len(ranges)):
-            if randomIndex >= ranges[index][0] and randomIndex <= ranges[index][1]:
-                p1Index = index
+    #     randomIndex = random.uniform(0,1)
+    #     for index in range(len(ranges)):
+    #         if randomIndex >= ranges[index][0] and randomIndex <= ranges[index][1]:
+    #             p1Index = index
             
-        p2Index = p1Index
-        while(p1Index == p2Index):
-            randomIndex = random.uniform(0,1)
-            for index in range(len(ranges)):
-                if randomIndex >= ranges[index][0] and randomIndex <= ranges[index][1]:
-                    p2Index = index
+    #     p2Index = p1Index
+    #     while(p1Index == p2Index):
+    #         randomIndex = random.uniform(0,1)
+    #         for index in range(len(ranges)):
+    #             if randomIndex >= ranges[index][0] and randomIndex <= ranges[index][1]:
+    #                 p2Index = index
 
-        return [self.population[p1Index], self.population[p2Index]]
+    #     return [self.population[p1Index], self.population[p2Index]]
     
-    def parentRBS(self):
+    # def parentRBS(self):
 
-        self.population.sort()
-        ranks = []
-        normalizedRanks = []
-        sumRanks = 0
-        ranges = []
+    #     self.population.sort()
+    #     ranks = []
+    #     normalizedRanks = []
+    #     sumRanks = 0
+    #     ranges = []
 
-        for rank in range(1, len(self.population)+1):
-            ranks.append(rank)
-            sumRanks += rank
-        self.population.reverse()
-        ranks.reverse()
-        for i in ranks:
-            normalizedRanks.append(i/sumRanks)
+    #     for rank in range(1, len(self.population)+1):
+    #         ranks.append(rank)
+    #         sumRanks += rank
+    #     self.population.reverse()
+    #     ranks.reverse()
+    #     for i in ranks:
+    #         normalizedRanks.append(i/sumRanks)
 
-        pointer = 0
-        for i in range(len(normalizedRanks)):
-            limits = [pointer, pointer+normalizedRanks[i]]
-            ranges.append(limits)
-            pointer += normalizedRanks[i]
+    #     pointer = 0
+    #     for i in range(len(normalizedRanks)):
+    #         limits = [pointer, pointer+normalizedRanks[i]]
+    #         ranges.append(limits)
+    #         pointer += normalizedRanks[i]
         
-        randomIndex = random.uniform(0,1)
-        for index in range(len(ranges)):
-            if randomIndex >= ranges[index][0] and randomIndex <= ranges[index][1]:
-                p1Index = index
+    #     randomIndex = random.uniform(0,1)
+    #     for index in range(len(ranges)):
+    #         if randomIndex >= ranges[index][0] and randomIndex <= ranges[index][1]:
+    #             p1Index = index
             
-        p2Index = p1Index
-        while(p1Index == p2Index):
-            randomIndex = random.uniform(0,1)
-            for index in range(len(ranges)):
-                if randomIndex >= ranges[index][0] and randomIndex <= ranges[index][1]:
-                    p2Index = index
+    #     p2Index = p1Index
+    #     while(p1Index == p2Index):
+    #         randomIndex = random.uniform(0,1)
+    #         for index in range(len(ranges)):
+    #             if randomIndex >= ranges[index][0] and randomIndex <= ranges[index][1]:
+    #                 p2Index = index
 
-        return [self.population[p1Index], self.population[p2Index]]
+    #     return [self.population[p1Index], self.population[p2Index]]
     
-    def parentTruncation(self):
-        self.population.sort()
-        self.population.reverse()
-        return [self.population[0], self.population[1]]
+    # def parentTruncation(self):
+    #     self.population.sort()
+    #     self.population.reverse()
+    #     return [self.population[0], self.population[1]]
     
-    def parentBinary(self):
-        contestant1 = random.randint(0, self.populationSize-1)
-        contestant2 = random.choice(list(set(range(0, self.populationSize)) - set([contestant1])))
+    # def parentBinary(self):
+    #     contestant1 = random.randint(0, self.populationSize-1)
+    #     contestant2 = random.choice(list(set(range(0, self.populationSize)) - set([contestant1])))
 
-        if self.population[contestant1][0] >= self.population[contestant2][0]:
-            p1Index = contestant1
-        else:
-            p1Index = contestant2
+    #     if self.population[contestant1][0] >= self.population[contestant2][0]:
+    #         p1Index = contestant1
+    #     else:
+    #         p1Index = contestant2
 
-        contestant1 = random.choice(list(set(range(0, self.populationSize)) - set([p1Index])))
-        contestant2 = random.choice(list(set(range(0, self.populationSize)) - set([p1Index, contestant1])))
+    #     contestant1 = random.choice(list(set(range(0, self.populationSize)) - set([p1Index])))
+    #     contestant2 = random.choice(list(set(range(0, self.populationSize)) - set([p1Index, contestant1])))
 
-        if self.population[contestant1][0] >= self.population[contestant2][0]:
-            p2Index = contestant1
-        else:
-            p2Index = contestant2
+    #     if self.population[contestant1][0] >= self.population[contestant2][0]:
+    #         p2Index = contestant1
+    #     else:
+    #         p2Index = contestant2
 
-        return [self.population[p1Index], self.population[p2Index]]
+    #     return [self.population[p1Index], self.population[p2Index]]
     
 
-    def survivorRandom(self):
-        randomlist = random.sample(range(0, len(self.population)), self.populationSize)
-        temp_population = []
-        for index in randomlist:
-            temp_population.append(self.population[index])
-        self.population=temp_population
+    # def survivorRandom(self):
+    #     randomlist = random.sample(range(0, len(self.population)), self.populationSize)
+    #     temp_population = []
+    #     for index in randomlist:
+    #         temp_population.append(self.population[index])
+    #     self.population=temp_population
 
-    def survivorTruncation(self):
-        self.population.sort()
-        self.population.reverse()
-        self.population = self.population[0:self.populationSize]
+    # def survivorTruncation(self):
+    #     self.population.sort()
+    #     self.population.reverse()
+    #     self.population = self.population[0:self.populationSize]
 
-    def survivorBinary(self):
-        selectedIndexes = []
+    # def survivorBinary(self):
+    #     selectedIndexes = []
 
-        for i in range(self.populationSize):
-            contestant1 = random.choice(list(set(range(0, len(self.population))) - set(selectedIndexes)))
-            contestant2 = random.choice(list(set(range(0, len(self.population))) - set(selectedIndexes + [contestant1])))
+    #     for i in range(self.populationSize):
+    #         contestant1 = random.choice(list(set(range(0, len(self.population))) - set(selectedIndexes)))
+    #         contestant2 = random.choice(list(set(range(0, len(self.population))) - set(selectedIndexes + [contestant1])))
 
-            if self.population[contestant1][0] >= self.population[contestant2][0]:
-                selectedIndexes.append(contestant1)
-            else:
-                selectedIndexes.append(contestant2)
+    #         if self.population[contestant1][0] >= self.population[contestant2][0]:
+    #             selectedIndexes.append(contestant1)
+    #         else:
+    #             selectedIndexes.append(contestant2)
 
-        tempPopulation = []
-        for index in selectedIndexes:
-            tempPopulation.append(self.population[index])
+    #     tempPopulation = []
+    #     for index in selectedIndexes:
+    #         tempPopulation.append(self.population[index])
         
-        self.population = tempPopulation
+    #     self.population = tempPopulation
                 
 
 
-def evolutionaryAlgorithm():
+# def evolutionaryAlgorithm():
 
-    for iteration in range(10):
+#     for iteration in range(10):
 
-        print("***** Iteration Number = " + str(iteration+1) + " *****")
-        g1 = GraphColoring(file = open('/Users/sajeelnadeemalam/Documents/CI/CI-Homework-1/gcol1.txt', 'r'))
-        g1.populate()
-        g1.calculateFitness()
+#         print("***** Iteration Number = " + str(iteration+1) + " *****")
+#         g1 = GraphColoring(file = open('/Users/sajeelnadeemalam/Documents/CI/CI-Homework-1/gcol1.txt', 'r'))
+#         g1.populate()
+#         g1.calculateFitness()
 
-        for generation in range(1000):
-            print("***** Iteration Number = " + str(iteration+1) + ", Generation Number = " + str(generation+1) + " *****")
+#         for generation in range(100):
+#             print("***** Iteration Number = " + str(iteration+1) + ", Generation Number = " + str(generation+1) + " *****")
 
-            for i in range(5):
-                parents = g1.parentRandom()
-                # parents = g1.parentFPS()
-                # parents = g1.parentRBS()
-                # parents = g1.parentTruncation()
-                # parents = g1.parentBinary()
+#             for i in range(5):
+#                 parents = g1.parentRandom()
+#                 # parents = g1.parentFPS()
+#                 # parents = g1.parentRBS()
+#                 # parents = g1.parentTruncation()
+#                 # parents = g1.parentBinary()
 
-                p1 = parents[0]
-                p2 = parents[1]
-                offsprings = g1.crossover(p1, p2)
-                for j in range(2):
-                    randomNumber = random.randint(0,1)
-                    if randomNumber == 1:
-                        tempOffspring = g1.mutation(offsprings[j])
-                        offsprings[j] = tempOffspring
+#                 p1 = parents[0]
+#                 p2 = parents[1]
+#                 offsprings = g1.crossover(p1, p2)
+#                 for j in range(2):
+#                     randomNumber = random.randint(0,1)
+#                     if randomNumber == 1:
+#                         tempOffspring = g1.mutation(offsprings[j])
+#                         offsprings[j] = tempOffspring
 
-                    offspring = g1.newFitness(offsprings[j])
-                    g1.population.append(offspring)
+#                     offspring = g1.newFitness(offsprings[j])
+#                     g1.population.append(offspring)
 
-            g1.survivorTruncation()
-            # g1.survivorRandom()
-            # g1.survivorBinary()
+#             g1.survivorTruncation()
+#             # g1.survivorRandom()
+#             # g1.survivorBinary()
 
-            print(g1.population[0])
-            print("number of colours: " + str(len(set(g1.population[0][1]))))
+#             print(g1.population[0])
+#             print("number of colours: " + str(len(set(g1.population[0][1]))))
   
-evolutionaryAlgorithm()
+
+# graphFile = '/Users/sajeelnadeemalam/Documents/CI/CI-Homework-1/gcol1.txt'
+# evolutionaryAlgorithm(graphFile)
