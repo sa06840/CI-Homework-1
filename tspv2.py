@@ -21,7 +21,7 @@ class TSP(SelectionSchemes):
         self.fitness=[]                     #stores total distance of every solution
         self.bestFitness= []
         self.averageFitness =[]
-        self.numOfGenerations = 1000
+        self.numOfGenerations = 10000
         self.numOfIterations  = 10
         self.maxDistance = 0 #changed
 
@@ -99,25 +99,25 @@ class TSP(SelectionSchemes):
         return (offspring)
 
     # def crossover(self, p1, p2):
-        self.length_of_solution=len(self.listOfCountries)
-        offspring1 = [0]*self.length_of_solution
-        offspring2 = [0]*self.length_of_solution
-        #eliminating fitness values for both parents        
-        p1 = p1[1]          
-        p2 = p2[1]   
-        temp=[]     
-        flag =0     
+        # self.length_of_solution=len(self.listOfCountries)
+        # offspring1 = [0]*self.length_of_solution
+        # offspring2 = [0]*self.length_of_solution
+        # #eliminating fitness values for both parents        
+        # p1 = p1[1]          
+        # p2 = p2[1]   
+        # temp=[]     
+        # flag =0     
 
-        start = random.randint(0, self.length_of_solution-1)
-        end = random.randint(0, self.length_of_solution-1)
+        # start = random.randint(0, self.length_of_solution-1)
+        # end = random.randint(0, self.length_of_solution-1)
 
-        while (start==end):
-            end = random.randint(0, self.length_of_solution-1)
+        # while (start==end):
+        #     end = random.randint(0, self.length_of_solution-1)
 
-        if start>end:
-                temp_index=end
-                end=start
-                start=temp_index   
+        # if start>end:
+        #         temp_index=end
+        #         end=start
+        #         start=temp_index   
         # print("start end indexes")
         # print(start,end)
       
@@ -163,56 +163,56 @@ class TSP(SelectionSchemes):
         #                     break
             
             
-        if start < end:
-            offspring1[0:start] = p2[0:start]
-            offspring1[end:] = p2[end:]
+        # if start < end:
+        #     offspring1[0:start] = p2[0:start]
+        #     offspring1[end:] = p2[end:]
 
-            for chromosome in p1[start:]:
-                if chromosome not in offspring1:
-                    temp.append(chromosome)
-                    if len(temp) == (end-start):
-                        offspring1[start:end] = temp
-                        flag = 1
-                        break
-            if (flag ==0):
-                for chromosome in p1[0:start]:
-                    if chromosome not in offspring1:
-                        temp.append(chromosome)
-                        if len(temp) == (end-start):
-                            offspring1[start:end] = temp
-                            flag = 1
-                            break
+        #     for chromosome in p1[start:]:
+        #         if chromosome not in offspring1:
+        #             temp.append(chromosome)
+        #             if len(temp) == (end-start):
+        #                 offspring1[start:end] = temp
+        #                 flag = 1
+        #                 break
+        #     if (flag ==0):
+        #         for chromosome in p1[0:start]:
+        #             if chromosome not in offspring1:
+        #                 temp.append(chromosome)
+        #                 if len(temp) == (end-start):
+        #                     offspring1[start:end] = temp
+        #                     flag = 1
+        #                     break
             
-            temp=[]
-            flag =0
+        #     temp=[]
+        #     flag =0
 
-            offspring2[:start] = p1[:start]
-            offspring2[end:] = p1[end:]
+        #     offspring2[:start] = p1[:start]
+        #     offspring2[end:] = p1[end:]
 
-            for chromosome in p2[start:]:
-                if chromosome not in offspring2:
-                    temp.append(chromosome)
-                    if len(temp) == (end-start):
-                        offspring2[start:end] = temp
-                        flag = 1
-                        break
-            if (flag ==0):
-                for chromosome in p2[0:start]:
-                    if chromosome not in offspring2:
-                        temp.append(chromosome)
-                        if len(temp) == (end-start):
-                            offspring2[start:end] = temp
-                            flag = 1
-                            break
+        #     for chromosome in p2[start:]:
+        #         if chromosome not in offspring2:
+        #             temp.append(chromosome)
+        #             if len(temp) == (end-start):
+        #                 offspring2[start:end] = temp
+        #                 flag = 1
+        #                 break
+        #     if (flag ==0):
+        #         for chromosome in p2[0:start]:
+        #             if chromosome not in offspring2:
+        #                 temp.append(chromosome)
+        #                 if len(temp) == (end-start):
+        #                     offspring2[start:end] = temp
+        #                     flag = 1
+        #                     break
 
 
-        offspring1 = [0, offspring1]
-        offspring2 = [0, offspring2]
-        print("OFFSPRING 1")
-        print(offspring1)
-        print("OFFSPRING 2")
-        print(offspring2)
-        return [offspring1, offspring2]
+        # offspring1 = [0, offspring1]
+        # offspring2 = [0, offspring2]
+        # print("OFFSPRING 1")
+        # print(offspring1)
+        # print("OFFSPRING 2")
+        # print(offspring2)
+        # return [offspring1, offspring2]
 
     
     
@@ -403,22 +403,22 @@ class TSP(SelectionSchemes):
     #     self.population = self.population[0:self.populationSize]
 
     # def survivorBinary(self):
-        selectedIndexes = []
+        # selectedIndexes = []
 
-        for i in range(self.populationSize):
-            contestant1 = random.choice(list(set(range(0, len(self.population))) - set(selectedIndexes)))
-            contestant2 = random.choice(list(set(range(0, len(self.population))) - set(selectedIndexes + [contestant1])))
+        # for i in range(self.populationSize):
+        #     contestant1 = random.choice(list(set(range(0, len(self.population))) - set(selectedIndexes)))
+        #     contestant2 = random.choice(list(set(range(0, len(self.population))) - set(selectedIndexes + [contestant1])))
 
-            if self.population[contestant1][0] >= self.population[contestant2][0]:
-                selectedIndexes.append(contestant1)
-            else:
-                selectedIndexes.append(contestant2)
+        #     if self.population[contestant1][0] >= self.population[contestant2][0]:
+        #         selectedIndexes.append(contestant1)
+        #     else:
+        #         selectedIndexes.append(contestant2)
 
-        tempPopulation = []
-        for index in selectedIndexes:
-            tempPopulation.append(self.population[index])
+        # tempPopulation = []
+        # for index in selectedIndexes:
+        #     tempPopulation.append(self.population[index])
         
-        self.population = tempPopulation 
+        # self.population = tempPopulation 
 
 
     def generationEvaluation(self):
@@ -462,10 +462,12 @@ class TSP(SelectionSchemes):
         
         for fitness in (addedBestFitness):
             avgBestFitness.append(fitness/self.numOfIterations)
-              
-        plt.plot(x_axis_generations, avgAverageFitness, label = "Average Fitness")
-        plt.plot(x_axis_generations, avgBestFitness, label = "Best Fitness")
-        
+       
+        plt.plot(x_axis_generations, avgBestFitness, label = "Best Fitness")       
+        plt.plot(x_axis_generations, avgAverageFitness,linestyle = "dashed", label = "Average Fitness")
+        plt.xlabel("Number of Generations")
+        plt.ylabel("Distance")
+        plt.title("Travelling Salesman Problem (TSP)")
         plt.legend()
         plt.show()
 

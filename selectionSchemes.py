@@ -1,4 +1,6 @@
 import random
+from operator import add
+from matplotlib import pyplot as plt
 
 class SelectionSchemes():
 
@@ -180,3 +182,4 @@ class SelectionSchemes():
             self.population = tempPopulation
             self.population.sort()
             self.population.reverse()
+   

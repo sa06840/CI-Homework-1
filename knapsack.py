@@ -1,6 +1,7 @@
 import random
 import numpy as np
-
+from matplotlib import pyplot as plt
+from operator import add
 from selectionSchemes import SelectionSchemes
 
 class Knapsack(SelectionSchemes):
@@ -11,6 +12,12 @@ class Knapsack(SelectionSchemes):
         self.population = [0]*self.populationSize
         self.text = []
         self.mutationRate = 0.5
+        self.bestsofar =0 
+        self.averageFitness=[]
+        self.bestFitness= []
+        self.numOfGenerations = 200
+        self.numOfIterations = 10
+
 
         super()
 
@@ -111,24 +118,6 @@ class Knapsack(SelectionSchemes):
                 offspring[1][randomIndex] = 1
             repeated.append(randomIndex)
 
-        # randomIndex1 = random.randint(0,self.text[0][0]-1)
-        # randomIndex2 = random.randint(0,self.text[0][0]-1)
-        # while randomIndex1 == randomIndex2:
-        #     randomIndex2 = random.randint(0,self.text[0][0]-1)
-
-        # if offspring[1][randomIndex1] == 1:
-        #     offspring[1][randomIndex1] = 0
-        #     if offspring[1][randomIndex2] == 1:
-        #         offspring[1][randomIndex2] = 0
-        #     else:
-        #         offspring[1][randomIndex2] = 1
-
-        # else:
-        #     offspring[1][randomIndex1] = 1
-        #     if offspring[1][randomIndex2] == 1:
-        #         offspring[1][randomIndex2] = 0
-        #     else:
-        #         offspring[1][randomIndex2] = 1
         return offspring
         
     def newFitness(self, offspring):
@@ -144,6 +133,56 @@ class Knapsack(SelectionSchemes):
             if totalWeight > self.maxWeight:
                 offspring[0] = 100
         return offspring
+
+    def generationEvaluation(self):
+        totalProfit = 0
+        
+        for chromosome in self.population:
+            totalProfit += chromosome[0]
+            if (chromosome[0]) > self.bestsofar:
+                self.bestsofar = chromosome[0]
+
+        self.averageFitness.append(totalProfit/len(self.population))
+        self.bestFitness.append(self.bestsofar)
+
+    def iterationEvaluation(self, fitnessEvaluation,iteration):
+        if iteration not in fitnessEvaluation:
+            fitnessEvaluation[iteration] = [[],[]]
+            fitnessEvaluation[iteration][0] = self.averageFitness 
+            fitnessEvaluation[iteration][1] = self.bestFitness
+          
+    def plotGraphs(self, fitnessEvaluation):
+        x_axis_generations = []
+        addedAverageFitness = [0]*self.numOfGenerations
+        addedBestFitness = [0]*self.numOfGenerations
+        avgAverageFitness = []
+        avgBestFitness = []
+
+        # list representing x axis (num of Generations)
+        for i in range (1, self.numOfGenerations+1):
+            x_axis_generations.append(i)
+       
+       #adding avgaveragefitness and best fitness values across all iterations
+        for iteration in (fitnessEvaluation):
+            addedAverageFitness = list(map(add, fitnessEvaluation[iteration][0], addedAverageFitness))
+            addedBestFitness  = list(map(add, fitnessEvaluation[iteration][1], addedBestFitness ))
+        
+        #adjusting added avgavergaefitness and best fitness values
+        #creating list representing y_axis (average avergae fitness values) and (average average best fitness values)
+        for fitness in (addedAverageFitness):
+            avgAverageFitness.append(fitness/self.numOfIterations)
+        
+        for fitness in (addedBestFitness):
+            avgBestFitness.append(fitness/self.numOfIterations)
+              
+        plt.plot(x_axis_generations, avgAverageFitness, linestyle = "dashed",label = "Average Fitness")
+        plt.plot(x_axis_generations, avgBestFitness, label = "Best Fitness")
+        plt.ylim(9000,10000)
+        plt.xlabel("Number of Generations")
+        plt.ylabel("Profit")
+        plt.title("Knapsack")
+        plt.legend()
+        plt.show()
     
 
     # def parentRandom(self):

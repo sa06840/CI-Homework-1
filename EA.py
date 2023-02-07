@@ -5,7 +5,7 @@ from graphColoring import GraphColoring
 
 
 def evolutionaryAlgorithm(knapsackFile, tspFile, graphFile):
-
+    fitnessEvaluation = dict()
     for iteration in range(10):
 
         print("***** Iteration Number = " + str(iteration+1) + " *****")
@@ -19,8 +19,8 @@ def evolutionaryAlgorithm(knapsackFile, tspFile, graphFile):
         g1.populate()
         g1.calculateFitness()
 
-        for generation in range(1000):
-            print("***** Iteration Number = " + str(iteration+1) + ", Generation Number = " + str(generation+1) + " *****")
+        for generation in range(g1.numOfGenerations):
+            # print("***** Iteration Number = " + str(iteration+1) + ", Generation Number = " + str(generation+1) + " *****")
 
             totalOffsprings = []
 
@@ -77,10 +77,10 @@ def evolutionaryAlgorithm(knapsackFile, tspFile, graphFile):
             # k1.truncation(1)
             # k1.binarySelection(1)
 
-            # g1.randomSelection(1)
+            g1.randomSelection(1)
             # g1.fpsSelection(1)
             # g1.rbsSelection(1)
-            g1.truncation(1)
+            # g1.truncation(1)
             # g1.binarySelection(1)
 
             # t1.randomSelection(1)
@@ -90,11 +90,23 @@ def evolutionaryAlgorithm(knapsackFile, tspFile, graphFile):
             # t1.binarySelection(1)
 
             # print(k1.population[0])
-            print(g1.population[0])
-            print("number of colours: " + str(len(set(g1.population[0][1]))))
+            # print(g1.population[0])
+            # print("number of colours: " + str(len(set(g1.population[0][1]))))
+
+            # k1.generationEvaluation()
+            g1.generationEvaluation()
+            # t1.generationEvaluation()
+            
+
             # print(t1.population[0])
             # print("distance: " + str(t1.maxDistance-t1.population[0][0]))
-
+        # k1.iterationEvaluation(fitnessEvaluation,iteration)
+        g1.iterationEvaluation(fitnessEvaluation,iteration)
+        # t1.iterationEvaluation(fitnessEvaluation,iteration)
+        
+    # k1.plotGraphs(fitnessEvaluation)
+    g1.plotGraphs(fitnessEvaluation)
+    # t1.plotGraphs(fitnessEvaluation)
   
 knapsackFile = 'instances_01_KP/low-dimensional/f8_l-d_kp_23_10000'
 tspFile ='qa194.tsp'

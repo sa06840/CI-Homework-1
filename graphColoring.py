@@ -1,5 +1,6 @@
 import random
-
+from matplotlib import pyplot as plt
+from operator import add
 from selectionSchemes import SelectionSchemes
 
 class GraphColoring(SelectionSchemes):
@@ -9,6 +10,11 @@ class GraphColoring(SelectionSchemes):
         self.text = []
         self.populationSize = 30
         self.population = []
+        self.bestsofar =9999999999
+        self.averageFitness=[]
+        self.bestFitness= []
+        self.numOfGenerations = 5000
+        self.numOfIterations = 10
 
         super()
 
@@ -123,6 +129,56 @@ class GraphColoring(SelectionSchemes):
         fitness = fitness - totalColors
         offspring[0] = fitness
         return offspring
+    
+    def generationEvaluation(self):
+        totalColors = 0
+        
+        for chromosome in self.population:
+            totalColors += len(set(chromosome[1]))
+            if (len(set(chromosome[1]))) < self.bestsofar:
+                self.bestsofar =len(set(chromosome[1]))
+
+        self.averageFitness.append(totalColors/len(self.population))
+        self.bestFitness.append(self.bestsofar)
+
+    def iterationEvaluation(self, fitnessEvaluation,iteration):
+        # print(iteration)
+        if iteration not in fitnessEvaluation:
+            fitnessEvaluation[iteration] = [[],[]]
+            fitnessEvaluation[iteration][0] = self.averageFitness 
+            fitnessEvaluation[iteration][1] = self.bestFitness
+          
+    def plotGraphs(self, fitnessEvaluation):
+        x_axis_generations = []
+        addedAverageFitness = [0]*self.numOfGenerations
+        addedBestFitness = [0]*self.numOfGenerations
+        avgAverageFitness = []
+        avgBestFitness = []
+
+        # list representing x axis (num of Generations)
+        for i in range (1, self.numOfGenerations+1):
+            x_axis_generations.append(i)
+       
+       #adding avgaveragefitness and best fitness values across all iterations
+        for iteration in (fitnessEvaluation):
+            addedAverageFitness = list(map(add, fitnessEvaluation[iteration][0], addedAverageFitness))
+            addedBestFitness  = list(map(add, fitnessEvaluation[iteration][1], addedBestFitness ))
+        
+        #adjusting added avgavergaefitness and best fitness values
+        #creating list representing y_axis (average avergae fitness values) and (average average best fitness values)
+        for fitness in (addedAverageFitness):
+            avgAverageFitness.append(fitness/self.numOfIterations)
+        
+        for fitness in (addedBestFitness):
+            avgBestFitness.append(fitness/self.numOfIterations)
+       
+        plt.plot(x_axis_generations, avgBestFitness, label = "Best Fitness")       
+        plt.plot(x_axis_generations, avgAverageFitness,linestyle = "dashed", label = "Average Fitness")
+        plt.xlabel("Number of Generations")
+        plt.ylabel("Number of Colors")
+        plt.title("Graph Coloring")
+        plt.legend()
+        plt.show()
 
 
     # def parentRandom(self):
